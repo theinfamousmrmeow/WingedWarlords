@@ -49,6 +49,7 @@ Partial Class CreditsScreen
         Me.BackColor = System.Drawing.Color.Black
         Me.ClientSize = New System.Drawing.Size(522, 375)
         Me.Controls.Add(Me.a)
+        Me.DoubleBuffered = True
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None
         Me.Name = "CreditsScreen"
         Me.Text = "CreditsScreen"

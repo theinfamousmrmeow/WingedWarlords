@@ -64,23 +64,11 @@ C:\Users\Dante\Documents\Visual Studio 2013\Projects\JoustClone\JoustClone\obj\D
 C:\Users\student\Documents\Visual Studio 2012\Projects\JoustClone\JoustClone\obj\Debug\JoustClone.CreditsScreen.resources
 C:\Users\student\Documents\Visual Studio 2012\Projects\JoustClone\JoustClone\obj\Debug\JoustClone.Intro.resources
 C:\Users\Dante\Documents\Visual Studio 2013\Projects\JoustClone\JoustClone\obj\Debug\JoustClone.Intro.resources
-C:\Users\Dante\Desktop\JoustClone\JoustClone\bin\Debug\JoustClone.exe.config
-C:\Users\Dante\Desktop\JoustClone\JoustClone\obj\Debug\Interop.WMPLib.dll
-C:\Users\Dante\Desktop\JoustClone\JoustClone\obj\Debug\AxInterop.WMPLib.dll
-C:\Users\Dante\Desktop\JoustClone\JoustClone\obj\Debug\JoustClone.vbproj.ResolveComReference.cache
-C:\Users\Dante\Desktop\JoustClone\JoustClone\obj\Debug\JoustClone.exe
-C:\Users\Dante\Desktop\JoustClone\JoustClone\obj\Debug\JoustClone.xml
-C:\Users\Dante\Desktop\JoustClone\JoustClone\obj\Debug\JoustClone.pdb
-C:\Users\Dante\Desktop\JoustClone\JoustClone\bin\Debug\JoustClone.exe
-C:\Users\Dante\Desktop\JoustClone\JoustClone\bin\Debug\JoustClone.pdb
-C:\Users\Dante\Desktop\JoustClone\JoustClone\bin\Debug\JoustClone.xml
-C:\Users\Dante\Desktop\JoustClone\JoustClone\bin\Debug\Interop.WMPLib.dll
-C:\Users\Dante\Desktop\JoustClone\JoustClone\bin\Debug\AxInterop.WMPLib.dll
-C:\Users\Dante\Desktop\JoustClone\JoustClone\obj\Debug\JoustClone.CreditsScreen.resources
-C:\Users\Dante\Desktop\JoustClone\JoustClone\obj\Debug\JoustClone.Form1.resources
-C:\Users\Dante\Desktop\JoustClone\JoustClone\obj\Debug\JoustClone.MainMenu.resources
-C:\Users\Dante\Desktop\JoustClone\JoustClone\obj\Debug\JoustClone.Resources.resources
-C:\Users\Dante\Desktop\JoustClone\JoustClone\obj\Debug\JoustClone.OptionsScreen.resources
-C:\Users\Dante\Desktop\JoustClone\JoustClone\obj\Debug\JoustClone.Intro.resources
-C:\Users\Dante\Desktop\JoustClone\JoustClone\obj\Debug\JoustClone.ScoreScreen.resources
-C:\Users\Dante\Desktop\JoustClone\JoustClone\obj\Debug\JoustClone.vbproj.GenerateResource.Cache
+C:\Users\student\Documents\Visual Studio 2012\Projects\JoustClone\JoustClone\bin\Debug\JoustClone.exe.manifest
+C:\Users\student\Documents\Visual Studio 2012\Projects\JoustClone\JoustClone\bin\Debug\JoustClone.application
+C:\Users\student\Documents\Visual Studio 2012\Projects\JoustClone\JoustClone\obj\Debug\JoustClone.exe.manifest
+C:\Users\student\Documents\Visual Studio 2012\Projects\JoustClone\JoustClone\obj\Debug\JoustClone.application
+C:\Users\Dante\documents\visual studio 2013\Projects\JoustClone\JoustClone\bin\Debug\JoustClone.exe.manifest
+C:\Users\Dante\documents\visual studio 2013\Projects\JoustClone\JoustClone\bin\Debug\JoustClone.application
+C:\Users\Dante\documents\visual studio 2013\Projects\JoustClone\JoustClone\obj\Debug\JoustClone.exe.manifest
+C:\Users\Dante\documents\visual studio 2013\Projects\JoustClone\JoustClone\obj\Debug\JoustClone.application

@@ -2,6 +2,14 @@
 
 Public Class CreditsScreen
 
+    Private Sub CreditsScreen_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
+        If Game.WON = True Then ScoreScreen.Show()
+    End Sub
+
+    Private Sub CreditsScreen_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+        If e.KeyCode = Keys.Escape Then Me.Close()
+    End Sub
+
 
     Private Sub CreditsScreen_Load(sender As Object, e As EventArgs) Handles Me.Load
 
@@ -12,7 +20,7 @@ Public Class CreditsScreen
         ''& CStr(Directory.GetCurrentDirectory())
         ''That shit grabs the working directory.
         ''I'm there's someway I can hunt down this text file pragmatically.
-        Dim Filename As String = "C:\Users\student\Documents\Visual Studio 2012\Projects\JoustClone\JoustClone\Resources\Credits.txt"
+        Dim Filename As String = My.Settings.credits_filepath
         Dim strOutput As String = My.Resources.Resources.Credits
         Dim counter As Integer = 1
 
@@ -77,5 +85,20 @@ Public Class CreditsScreen
 
         '' e.Graphics.DrawString(a.Text, Font, gradbrush, a.Top, a.Left)
 
+    End Sub
+
+    Dim counter As Integer = 0
+
+    Private Sub CreditsScreen_Paint1(sender As Object, e As PaintEventArgs) Handles Me.Paint
+        ''Me.Invalidate()
+        If Me.Controls.Contains(a) Then Me.Controls.Remove(a)
+        counter += 1
+        If counter > 300 Then counter = 0
+        Dim gradbrush = New Drawing2D.LinearGradientBrush(New Point(1 + counter, 1), New Point(300 + counter, 15), Color.Goldenrod, Color.AliceBlue)
+        Dim bob As New StringFormat()
+
+        bob.Alignment = StringAlignment.Center
+        bob.LineAlignment = StringAlignment.Center
+        e.Graphics.DrawString(a.Text, a.Font, gradbrush, New Point(Me.Width / 2, a.Top + Me.Height), bob)
     End Sub
 End Class

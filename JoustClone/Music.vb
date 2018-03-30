@@ -2,7 +2,7 @@
 
     Dim lastsfx
     Dim lastsfx_time As Integer = 0
-
+    Dim lastpriority As Integer = 0
     ' Accessing the Winmm.dll, a windows API
     ' Not sure what kind of legal issues this raises...
 
@@ -14,16 +14,18 @@
     Private Declare Function mciSendString Lib "winmm.dll" Alias "mciSendStringA" (ByVal lpstrCommand As String, ByVal lpstrReturnString As String, ByVal uReturnLength As Int32, ByVal hwndCallback As Int32) As Int32
 
 
-    Sub play_sfx(ByVal sound)
+    Sub play_sfx(ByVal sound As Object, Optional ByVal priority As Integer = 0)
+        If My.Settings.play_sounds = True Then
+            '' If Not sound.ToString = lastsfx.ToString Then
+            If lastsfx_time < Game.TIME + 6 Or priority > lastpriority Then
+                My.Computer.Audio.Play(sound, AudioPlayMode.Background)
+                lastpriority = priority
+                lastsfx_time = Game.TIME
+                lastsfx = sound
+            End If
 
-        '' If Not sound.ToString = lastsfx.ToString Then
-        If lastsfx_time < Game.TIME + 3 Then
-            My.Computer.Audio.Play(sound, AudioPlayMode.Background)
+
         End If
-
-        lastsfx_time = Game.TIME
-        lastsfx = sound
-
     End Sub
 
     Sub play_bgm(ByVal file_location As String)
@@ -47,6 +49,11 @@
             mciSendString(playCommand, Nothing, 0, IntPtr.Zero)
 
         End If
+    End Sub
+
+    Sub Reset()
+        lastpriority = -1
+        lastsfx_time = -1
     End Sub
 
 End Module

@@ -3,25 +3,28 @@
 
 Public Class ParallaxObject
     Public Z As Integer = 0
+    Public y_flip As Integer = 1
     Public x_factor As Decimal = 0
     Public Image As Image
     Public Scale As Decimal
     Public Width As Integer
     Public Height As Integer
 
-    Sub New(img As Image)
+    Sub New(img As Image, Optional y As Integer = 1)
         Z = Game.Random.Next(Game.DISTANCE_TO_CASTLE) + 100
         x_factor = (Game.Random.Next(200) - 100) / 100
         Image = img
         Scale = 1
+        y_flip = y
         Width = img.Width * Scale
         Height = img.Height * Scale
     End Sub
+
 End Class
 
 Public Class Particle : Inherits Label
 
- 
+
     Public spawn_time As Integer = 0
     Public float_rate As Integer = 1
     Public exists_length = 60
@@ -33,18 +36,16 @@ Public Class Particle : Inherits Label
                                        }
     ''Set the particle brush to one of those above
     Public mybrush As Brush = SplashBrushes(Math.Round(Game.Random.Next(5)))
-    ''Shadows Text As String = "100"
+
+    Sub New()
+
+    End Sub
 
     Sub New(ByRef time As Integer, x As Integer, y As Integer, mytext As String)
-        ''Adds himself to the collection that you gave it
-
-
         Visible = True
         Width = 30
         Height = 20
         AutoSize = True
-
-
         ForeColor = Color.Lime
         BackColor = Color.Transparent
         spawn_time = time
@@ -53,13 +54,18 @@ Public Class Particle : Inherits Label
         time += 1
         Left = x + Width / 2
         Top = y + Height / 2
-        ''TheList.Add(myself, Name.ToString)
         TextAlign = ContentAlignment.MiddleCenter
         Text = mytext
         BringToFront()
         Left -= mytext.Length * 6
         exists_length = 15 + Text.LongCount * 5
-
     End Sub
 
+End Class
+
+Public Class prt_ring : Inherits Particle
+    Sub New()
+        Text = " "
+        exists_length = 10
+    End Sub
 End Class

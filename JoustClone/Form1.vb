@@ -11,7 +11,7 @@ Public Class Form1
     Public Const AI_floor = 480 * (7 / 8)
 
     Dim number_of_agents As Integer = 0
-    Public BarrierList As New Microsoft.VisualBasic.Collection()
+
     Public ParticleList As New Microsoft.VisualBasic.Collection()
 
     ''Declare user controls
@@ -47,10 +47,20 @@ Public Class Form1
 
     Function get_nearest_player(ByVal a As Agent) As Agent
         Dim target As Object
-        If LIVES(1) > 0 Then
-            target = Game.PLAYERS(1)
-        Else : target = a
-        End If
+        Dim targetdist As Integer = 1000
+        Dim dist As Integer = 0
+        If Game.PLAYERS.Count > 0 Then target = Game.PLAYERS(1) Else  : target = a
+
+        For Each player As Knight In Game.PLAYERS
+            dist = Math.Abs(a.Left - player.Left)
+            If dist < targetdist Then
+                target = Game.PLAYERS(player.Name)
+                targetdist = dist
+            End If
+
+        Next
+
+
         Return target
 
     End Function
@@ -79,19 +89,18 @@ Public Class Form1
                 bob.palette = agent.palette
                 bob.Vspeed = agent.Vspeed
                 ''End If
+                ''Play the knight death sound
+                Sound.play_sfx(My.Resources.sfx_impale_enemy, 1)
             End If
 
             ''Get some points depending on type
             Dim scoreworth As Integer = 0
             If TypeOf agent Is Mount Then scoreworth = 0
-            If TypeOf agent Is Knight Then scoreworth = 50
+            If TypeOf agent Is Knight Then scoreworth = 50 * (agent.Skill + 1)
             If TypeOf agent Is Rider Then scoreworth = 100
             ''If he falls out of the game, you get no points
             If agent.Top >= DEFAULT_HEIGHT Then scoreworth = 0
             Game.GetScore(scoreworth, agent.Left, agent.Top)
-
-            ''Play the agent death sound
-            Sound.play_sfx(My.Resources.sfx_hit_enemy)
             ''Remove from agent collection
             Game.Agents.Remove(agent.Name)
             If Game.ENEMIES.Contains(agent.Name) Then Game.ENEMIES.Remove(agent.Name)
@@ -100,7 +109,7 @@ Public Class Form1
 
             ''IF A PLAYER DIED
         Else
-            Game.GetScore(-100, Game.PLAYERS(1).Top, Game.PLAYERS(1).Left)
+            Game.GetScore(-100, agent.Top, agent.Left)
             Game.LoseLife(agent)
             agent.Top = DEFAULT_HEIGHT / 2
             agent.Left = DEFAULT_WIDTH / 2
@@ -127,7 +136,7 @@ Public Class Form1
         b.Top = y - b.Height / 2
 
         ''Me.Controls.Add(b)
-        Me.BarrierList.Add(b)
+        Game.BarrierList.Add(b)
 
     End Sub
 
@@ -154,7 +163,7 @@ Public Class Form1
 
     Sub Physics(things As Collection)
 
-        ''Update graphics
+        ''Update sprites
         For Each Knight As Agent In things
             If TypeOf Knight Is Knight Then
                 If Knight.OnGround = False Then
@@ -162,12 +171,22 @@ Public Class Form1
                         Knight.Image = My.Resources.rider_up
                     Else : Knight.Image = My.Resources.rider_down
                     End If
+                    If Knight.dive = True Then Knight.Image = My.Resources.rider_dive
                     If Knight.facing < 0 And Knight.Hspeed > 0 Then Knight.Image = My.Resources.rider_turn
                     If Knight.facing > 0 And Knight.Hspeed < 0 Then Knight.Image = My.Resources.rider_turn
+
                 Else
                     Knight.Image = My.Resources.Resources.rider_stand
                 End If
-
+            End If
+            ''Rider Sprites
+            If TypeOf Knight Is Rider Then
+                If Knight.Vspeed > 0 Then
+                    Knight.Image = My.Resources.knight_fall
+                End If
+                If Knight.Vspeed = 0 Then
+                    Knight.Image = My.Resources.knight_dismount
+                End If
             End If
         Next
         ''END PLAYER SECTION
@@ -219,7 +238,7 @@ Public Class Form1
             End If
 
             ''Hit Walls
-            For Each barrier As Barrier In Me.BarrierList
+            For Each barrier As Barrier In Game.BarrierList
                 ''Make sure what we're looking at is a barrier
                 If barrier.Name = "Barrier" Then
                     ''Check for physical collisions
@@ -229,7 +248,9 @@ Public Class Form1
             ''See if he's on the ground
             ''If he's considered to be on the ground yet,
             ''Check to see if he is now
+            Dim changed As Boolean = guy.OnGround
             guy.OnGround = Not position_free(BarrierList, guy.Left + guy.Width / 2, guy.Bottom, guy.Width)
+            If Not guy.OnGround = changed And changed = False And IsPlayer(guy) Then Sound.play_sfx(My.Resources.sfx_land, -1)
 
             ''Fall off bottom and die.  Has to be last thing called, as it might
             ''Dereference the object
@@ -254,7 +275,7 @@ Public Class Form1
 
         ''DEBUG
         If Game.DISTANCE_TRAVELED < Game.LEVEL * 100 Then
-            Game.DISTANCE_TRAVELED += 1
+            Game.DISTANCE_TRAVELED += 0.5
             Me.Invalidate()
         End If
         ''DEBUG
@@ -263,23 +284,30 @@ Public Class Form1
             Game.Win()
         End If
 
+        ''Spawn the blocks if we are done moving
+        If Game.DISTANCE_TRAVELED = Game.LEVEL * 100 And Game.SPAWNED_BLOCKS = False Then
+            Game.BLOCKOUT_LEVEL()
+        End If
+
 
         ''Check for end of wave
         If Game.ENEMIES.Count = 0 And Game.INTERLUDE_START = -1 And Game.ENEMIES_SPAWNED = -1 Then
 
             Game.Wave_next()
-            Dim myself As New Particle(Game.TIME, Game.DEFAULT_WIDTH / 2, Game.DEFAULT_HEIGHT / 2, "PREPARE THYSELF")
-            ParticleList.Add(myself, myself.Name)
-            myself.float_rate = 0
+            If Game.NUM_PLAYERS = 1 Then Game.SplashText(Game.TIME, "PREPARE THYSELF")
+            If Game.NUM_PLAYERS = 2 Then Game.SplashText(Game.TIME, "PREPARE THYSELVES")
+            If WAVE = 1 Then Game.SplashText(Game.TIME, "FLYING O'ER TO YON CASTLE")
+
 
         End If
         ''CHECK FOR PLAYERS DEAD
         If Game.PLAYERS.Count = 0 And Game.DEATH_START = -1 Then
-
+            Dim myself As Particle
             Game.DEATH_START = Game.TIME
-            Dim myself As New Particle(Game.TIME, Game.DEFAULT_WIDTH / 2, Game.DEFAULT_HEIGHT / 2, "THY LIFE IS SPENT")
-            ParticleList.Add(myself, myself.Name)
-            myself.float_rate = 0
+            If Game.NUM_PLAYERS = 1 Then myself = Game.SplashText(Game.TIME, "THY LIFE IS SPENT")
+            If Game.NUM_PLAYERS > 1 Then myself = Game.SplashText(Game.TIME, "THY LIVES ARE SPENT")
+            Sound.play_sfx(My.Resources.sfx_losegame, 10)
+
 
         End If
 
@@ -323,9 +351,20 @@ Public Class Form1
                             Destroy_Agent(player)
                         Else
                             ''It there was no winner, do a Parry
-                            Sound.play_sfx(My.Resources.sfx_parry)
-                            player.Hspeed *= -(1) ''Bounce off, and halve the speed
-                            enemy.Hspeed = player.Hspeed * -1 ''Grant that impact speed to guy he hit
+                            Sound.play_sfx(My.Resources.sfx_parry, 2)
+                            ''BOUNCES AWAY PROPERLY NOW
+                            If player.Left < enemy.Left And player.Hspeed > 0 Then
+                                player.Hspeed *= -1
+                                enemy.Hspeed = player.Hspeed * -1
+                            elseIf player.Left > enemy.Left And player.Hspeed < 0 Then
+                                player.Hspeed *= -1
+                                enemy.Hspeed = player.Hspeed * -1
+                            Else
+                                player.Hspeed *= 1.1
+                                enemy.Hspeed = player.Hspeed * -1
+                            End If
+                        '' player.Hspeed *= -(1) ''Bounce off, and halve the speed
+                        '' enemy.Hspeed = player.Hspeed * -1 ''Grant that impact speed to guy he hit
                         End If
                         ''End of collision with player
                     End If
@@ -360,7 +399,7 @@ Public Class Form1
                     End If
                     ''Weight it to jump the lower he is
                     If enemy.Bottom > DEFAULT_HEIGHT Then enemy.Top = DEFAULT_HEIGHT - enemy.Height
-                    If enemy.Vspeed >= 0 And Game.Random.Next(35 - (Math.Round((enemy.Bottom / DEFAULT_HEIGHT) * 30))) = 1 Then
+                    If enemy.Vspeed >= 0 And Game.Random.Next(35 - (Math.Round(((enemy.Bottom / DEFAULT_HEIGHT) * 30) - enemy.skill / 2))) = 1 Then
                         enemy.INPUT_y = -1
                     Else : enemy.INPUT_y = 0
                     End If
@@ -369,7 +408,7 @@ Public Class Form1
                 ''SKILLED MOVEMENT
                 If enemy.skill > 0 Then
                     Dim myenemy = get_nearest_player(enemy)
-                    If Game.Random.Next(10) = 5 Then
+                    If Game.Random.Next(10 - enemy.skill) = 2 Then
                         If myenemy.Left < enemy.Left Then enemy.facing = -1 Else enemy.facing = 1
                     End If
                     ''Weight it to jump the lower he is
@@ -397,11 +436,26 @@ Public Class Form1
         Game.Parallax.Add(bob, "Castle")
 
         Dim i As Integer = 0
+        Dim mydist As Integer = 999
         Do Until i = 10
             i += 1
             bob = New ParallaxObject(My.Resources.crag)
+            bob.Z = mydist
+            mydist -= 99
             Game.Parallax.Add(bob, "Scenery" + i.ToString)
         Loop
+        ''Make me some clouds
+        ''These are super cool but will just take too long to implement now
+        'i = 0
+        'mydist = 500
+        'Do Until i = 8
+        '    i += 1
+        '    bob = New ParallaxObject(My.Resources.clouds, -1 * Game.Random.Next(2) / 2)
+        '    bob.Z = mydist
+        '    bob.Scale = 0.8
+        '    mydist -= 200
+        '    Game.Parallax.Add(bob, "Clouds" + i.ToString)
+        'Loop
 
         Me.Width = 640
         Me.Height = 480
@@ -412,19 +466,14 @@ Public Class Form1
         ''Create the player
         player = Spawning.Spawn_Player(ClientRectangle.Width / 2, ClientRectangle.Height / 4)
         player.Image = My.Resources.Resources.rider_stand
-        player.Shielded = True
         player.has_sword = False
         ''Spawn Player2
         If Game.NUM_PLAYERS = 2 Then
             player = Spawning.Spawn_Player(ClientRectangle.Width / 2 + 30, ClientRectangle.Height / 4)
+            player.palette = Palettes.playertwo
             player.Image = My.Resources.Resources.rider_stand
-            player.Shielded = True
             player.has_sword = False
         End If
-
-        Spawn_Barrier(ClientRectangle.Width / 4, ClientRectangle.Height / 4)
-        Spawn_Barrier(ClientRectangle.Width * (3 / 4), ClientRectangle.Height / 4)
-        Spawn_Barrier(ClientRectangle.Width * (1 / 2), ClientRectangle.Height * (3 / 4))
 
         If My.Settings.fullscreen = True Then Me.WindowState = FormWindowState.Maximized
 
@@ -467,6 +516,19 @@ Public Class Form1
         If e.KeyCode = Keys.NumPad5 Then
             joystick2.INPUT_ydir = 1
         End If
+
+        ''Check here for escape keya
+        If e.KeyCode = Keys.Escape Then
+            Me.Close()
+        End If
+        ''Cheat code to kill all enemies on screen
+        If e.KeyCode = Keys.Delete Then
+            For Each Agent As Agent In Game.ENEMIES
+                Game.ENEMIES.Remove(Agent.Name)
+                Game.Agents.Remove(Agent.Name)
+            Next
+        End If
+
     End Sub
 
     ''Releasing Keys
@@ -527,58 +589,55 @@ Public Class Form1
 
     Private Sub Form1_Paint(sender As Object, e As PaintEventArgs) Handles MyBase.Paint
 
+        Game.HUDBRUSH = New Drawing2D.LinearGradientBrush(New Point(0 + Game.TIME Mod 30, 0), New Point(15 + Game.TIME Mod 30, 15), Color.Gold, Color.Azure)
         ''This scales what you're seeing.
         e.Graphics.ScaleTransform(VIEW_RATIO_WIDTH, VIEW_RATIO_HEIGHT)
         ''INterpolation is bad for pixel-art
         e.Graphics.InterpolationMode = InterpolationMode.Low
 
-        e.Graphics.DrawRectangle(Pens.Blue, 0, 0, 100, 100)
         ''Draw the background
-        Dim skybrush = New LinearGradientBrush(New Point(0, 0), New Point(0, SKY_BOTTOM), Color.Violet, Color.DarkOrange)
-        Dim seabrush = New LinearGradientBrush(New Point(0, 0), New Point(0, DEFAULT_HEIGHT), Color.CornflowerBlue, Color.Black)
         Dim horizonpen = Pens.Red
         ''Draw Create Sea and Sky
         Dim sky = New Rectangle(0, 0, DEFAULT_WIDTH, SKY_BOTTOM)
         Dim sea = New Rectangle(0, SKY_BOTTOM, DEFAULT_WIDTH, DEFAULT_HEIGHT)
-        ''Draw SKY
-        ''e.Graphics.FillRectangle(skybrush, sky)
-        ''Draw Sea
-        e.Graphics.FillRectangle(seabrush, sea)
-        ''Draw Horizon
-        e.Graphics.DrawLine(horizonpen, New Point(0, SKY_BOTTOM), New Point(DEFAULT_WIDTH, SKY_BOTTOM))
-
         'NEW SKYDRAW
-        Dim band_height As Integer = 5
+        Dim band_height As Integer = 8
         Dim alternate_bands As Integer = 1
         Dim cur_y As Integer = SKY_BOTTOM
         Do Until band_height = 0
             Dim myrect As New Rectangle(0, cur_y - band_height, DEFAULT_WIDTH, band_height)
             cur_y -= band_height
-            e.Graphics.FillRectangle(Brushes.Red, myrect)
+            e.Graphics.FillRectangle(Brushes.DarkMagenta, myrect)
             ''
             myrect = New Rectangle(0, cur_y - alternate_bands, DEFAULT_WIDTH, alternate_bands)
             cur_y -= alternate_bands
-            e.Graphics.FillRectangle(Brushes.Purple, myrect)
+            e.Graphics.FillRectangle(Brushes.DarkSlateBlue, myrect)
             alternate_bands += 1
             band_height -= 1
         Loop
         ''Draw the rest of the sky
         Dim myrect2 As Rectangle
         myrect2 = New Rectangle(0, 0, DEFAULT_WIDTH, cur_y)
-        e.Graphics.FillRectangle(Brushes.Purple, myrect2)
-
-        ''DRAW THE FORTRESS OF THE DRAGON-WIZARD
-        'Dim castle_scale As Decimal = 0 + Game.WAVE / 10
-        'Dim castle_width As Decimal = My.Resources.castle.Width * castle_scale
-        'Dim castle_height As Decimal = My.Resources.castle.Height * castle_scale
-        'e.Graphics.DrawImage(My.Resources.castle, DEFAULT_WIDTH / 2 - castle_width / 2, SKY_BOTTOM - castle_height, castle_width, castle_height)
-        ' ''Draw the Sea-Crags on the way there
-        'castle_scale = 0 + Game.WAVE / 10
-        'castle_width = My.Resources.crag.Width * castle_scale
-        'castle_height = My.Resources.crag.Height * castle_scale
-        'e.Graphics.DrawImage(My.Resources.crag, DEFAULT_WIDTH / 4 - castle_width / 2, SKY_BOTTOM - castle_height, castle_width, castle_height)
-
-
+        e.Graphics.FillRectangle(Brushes.DarkSlateBlue, myrect2)
+        ''
+        'NEW SEADRAW
+        band_height = 8
+        alternate_bands = 1
+        cur_y = SKY_BOTTOM
+        Do Until band_height = 0
+            Dim myrect As New Rectangle(0, cur_y, DEFAULT_WIDTH, band_height)
+            cur_y += band_height
+            e.Graphics.FillRectangle(Brushes.MidnightBlue, myrect)
+            ''
+            myrect = New Rectangle(0, cur_y, DEFAULT_WIDTH, alternate_bands)
+            cur_y += alternate_bands
+            e.Graphics.FillRectangle(Brushes.Navy, myrect)
+            alternate_bands += 1
+            band_height -= 1
+        Loop
+        ''Draw the rest of the sky
+        myrect2 = New Rectangle(0, cur_y, DEFAULT_WIDTH, DEFAULT_HEIGHT - cur_y)
+        e.Graphics.FillRectangle(Brushes.Navy, myrect2)
         ''DRAWING THE PARALLAX OBJECTS
         For Each scenery As ParallaxObject In Game.Parallax
             ''Draw the Sea-Crags on the way there
@@ -588,39 +647,59 @@ Public Class Form1
             If distance_to_me = -1 Then obj_scale = 0
             If obj_scale < 0 Then obj_scale = 0
             Dim x_offset As Integer = DEFAULT_WIDTH / 2 + ((Game.DISTANCE_TO_CASTLE - distance_to_me) / 900) * DEFAULT_WIDTH / 2 * scenery.x_factor
-            Dim y_offset As Integer = SKY_BOTTOM + ((Game.DISTANCE_TO_CASTLE - distance_to_me) / 900) * (DEFAULT_HEIGHT - SKY_BOTTOM) / 4
+            Dim y_offset As Integer = SKY_BOTTOM + (((Game.DISTANCE_TO_CASTLE - distance_to_me) / 900) * (DEFAULT_HEIGHT - SKY_BOTTOM) / 4) * scenery.y_flip
 
             obj_scale += 0.1
             Dim castle_width As Decimal = scenery.Width * obj_scale
             Dim castle_height As Decimal = scenery.Height * obj_scale
             e.Graphics.DrawImage(scenery.Image, x_offset - castle_width / 2, y_offset - castle_height, castle_width, castle_height)
-            ''e.Graphics.DrawImage(scenery.Image, x_offset - castle_width / 2, SKY_BOTTOM - scenery.Image.Height, 32, 32)
+            If scenery.y_flip = 1 Then e.Graphics.DrawLine(Pens.Teal, New Point(x_offset - castle_width / 1.75, y_offset + 1), New Point(x_offset + castle_width / 1.75, y_offset + 1))
 
         Next
         ''
         Dim gradbrush = New LinearGradientBrush(New Point(0, 0), New Point(15, 15), Color.Gold, Color.White)
         Dim HUDfont = New Font("Arial", 8)
         e.Graphics.TextContrast() = 1
-        e.Graphics.DrawString("Level: " & Game.LEVEL.ToString & " - " & WAVE.ToString, HUDfont, Brushes.White, New Point(10, 25))
 
-        e.Graphics.DrawString("Score: " & Game.SCORE.ToString, HUDfont, Brushes.White, New Point(10, 10))
-
-        ''e.Graphics.DrawString("Distance Traveled: " & Game.DISTANCE_TRAVELED.ToString, HUDfont, Brushes.Red, New Point(10, SKY_BOTTOM))
         ''Draw the lives counter
-        e.Graphics.DrawString("Lives: ", Game.FONT, Game.brush_player1, New Point(10, DEFAULT_HEIGHT - 32))
+        e.Graphics.DrawString(Game.LEVEL.ToString + "-" + Game.WAVE.ToString, Game.FONT, Game.HUDBRUSH, New Point(DEFAULT_WIDTH / 2 - 16, DEFAULT_HEIGHT - 48))
+        e.Graphics.DrawString("Score: " & Game.SCORE.ToString, Game.FONT, Game.HUDBRUSH, New Point(DEFAULT_WIDTH / 2 - 64, DEFAULT_HEIGHT - 24))
+        e.Graphics.DrawString("Lives: ", Game.FONT, Game.brush_player1, New Point(10, DEFAULT_HEIGHT - 24))
         For xx As Integer = 1 To Game.LIVES(1) Step 1
-            e.Graphics.DrawImage(My.Resources.helmets, 64 + xx * 18, DEFAULT_HEIGHT - 32)
+            e.Graphics.DrawImage(My.Resources.helmets, 64 + xx * 18, DEFAULT_HEIGHT - 24)
         Next
         ''Draw the lives counter for player 2
         If Game.NUM_PLAYERS = 2 Then
-            e.Graphics.DrawString("Lives: ", Game.FONT, Game.brush_player2, New Point(10, DEFAULT_HEIGHT - 64))
+            e.Graphics.DrawString("Lives: ", Game.FONT, Game.brush_player2, New Point(10, DEFAULT_HEIGHT - 56))
             For xx As Integer = 1 To Game.LIVES(2) Step 1
-                e.Graphics.DrawImage(My.Resources.helmets, 64 + xx * 18, DEFAULT_HEIGHT - 64)
+                ''Palette shift the helmets SON
+                '' e.Graphics.DrawImage(My.Resources.helmets, 64 + xx * 18, DEFAULT_HEIGHT - 64)
+
+                Dim att = New System.Drawing.Imaging.ImageAttributes()
+                att.SetColorMatrix(Palettes.playertwo)
+                e.Graphics.DrawImage(My.Resources.helmets, New Rectangle(64 + xx * 18, DEFAULT_HEIGHT - 56, My.Resources.helmets.Width, My.Resources.helmets.Height), 0, 0, My.Resources.helmets.Height, My.Resources.helmets.Width, GraphicsUnit.Pixel, att)
+
+
+
+
             Next
         End If
-
         ''DRAW ALL THE AGENTS
         'DEBUG
+
+        ''DRAW A BUBBLE ON THE PICKUPS
+        For Each a As Object In Game.Pickups
+
+            ''Draw a bubble
+            Dim gradbrush2 = New LinearGradientBrush(New Point(0, 0), New Point(16, 16), Color.Aqua, Color.Fuchsia)
+            Dim apen = New Pen(gradbrush2)
+            apen.Width = 2
+            apen.DashStyle = DashStyle.Dash
+            apen.DashCap = DashCap.Triangle
+            e.Graphics.DrawEllipse(apen, a.Left, a.Top, a.Width, a.Height)
+
+        Next
+
         For Each a As Agent In Game.Agents
 
             If a.spawnedtime + Game.INVINCIBILITY_LENGTH > Game.TIME Then
@@ -629,7 +708,8 @@ Public Class Form1
 
             If a.spawnedtime + Game.INVINCIBILITY_LENGTH < Game.TIME Then a.Visible = True
 
-            If a.Visible = False Or a.Shielded = True And a.Isplayer(a) Then
+            If (a.Visible = False Or a.Shielded = True) And IsPlayer(a) Then
+                ''Draw a protector bubble thing
                 Dim gradbrush2 = New LinearGradientBrush(New Point(0, 0), New Point(16, 16), Color.Goldenrod, Color.AliceBlue)
                 Dim apen = New Pen(gradbrush2)
                 apen.Width = 2
@@ -640,44 +720,41 @@ Public Class Form1
 
 
 
-
-            If a.Visible Then
+            ''Drawing the Sprite
+            ''Now with palette swapping SON
+            If a.Visible Or a.Visible = False And IsPlayer(a) Then
                 Dim offset As Integer = 0
                 If a.facing = -1 Then offset = a.Width
-
-                ''Use a hatch brush to tile an image?
-                Dim hatchbrush = New TextureBrush(a.Image)
-                ''Graphics.FillRectangle(hatchbrush, a.Top, a.Left, a.Width, a.Height)
                 Dim att As New System.Drawing.Imaging.ImageAttributes()
-                ''att.SetColorMatrix(a.palette)
-                ''e.Graphics.DrawImage(a.Image, a.Left + offset, a.Top, (a.Width * a.facing), a.Height)
-                ''  e.Graphics.DrawImage(a.Image, New Rectangle(a.Left + offset, a.Top, a.Width, a.Height), 0, 0, a.Image.Width, a.Image.Height, GraphicsUnit.Pixel, att)
-                '' att.SetColorMatrix(Palettes.normal)
-                ''e.Graphics.DrawImage(a.Image, New Rectangle(a.Left + offset, a.Top, a.Width * a.facing, a.Height), 0, 0, a.Image.Width, a.Image.Height, GraphicsUnit.Pixel, att)
                 att.SetColorMatrix(a.palette)
+                If a.Visible = False Then att.SetColorMatrix(Palettes.whiteout)
                 e.Graphics.DrawImage(a.Image, New Rectangle(a.Left + offset, a.Top, a.Width * a.facing, a.Height), 0, 0, a.Image.Width, a.Image.Height, GraphicsUnit.Pixel, att)
 
-                '' e.Graphics.DrawImage(a.Image, a.Left + offset, a.Top, (a.Width * a.facing), a.Height)
-                ''negative(a.Image, a, e.Graphics)
             End If
 
         Next
 
         ''Drawing all the walls
-        For Each a As Barrier In Me.BarrierList
-            Dim gradpen = New LinearGradientBrush(New Point(0, 0), New Point(32, 16), Color.BlanchedAlmond, Color.CornflowerBlue)
+        For Each a As Barrier In BarrierList
+            Dim gradpen = New LinearGradientBrush(New Point(0, 0), New Point(32, 16), Color.BlanchedAlmond, Color.AliceBlue)
             Dim apen = New Pen(gradbrush)
             apen.Width = 2
-            Dim hatchbrush = New System.Drawing.Drawing2D.HatchBrush(System.Drawing.Drawing2D.HatchStyle.ZigZag, Color.Red, Color.Blue)
+            ''Dim hatchbrush = New System.Drawing.Drawing2D.HatchBrush(System.Drawing.Drawing2D.HatchStyle.ZigZag, Color.Red, Color.Blue)
             apen.DashStyle = DashStyle.Solid
             apen.LineJoin = LineJoin.Bevel
-            e.Graphics.DrawRectangle(apen, a.Bounds)
+            ''e.Graphics.DrawRectangle(apen, a.Bounds)
             e.Graphics.FillRectangle(gradpen, a.Bounds)
         Next
 
         ''Drawing all the Particle Effects
         For Each a As Particle In Me.ParticleList
-            e.Graphics.DrawString(a.Text, Game.FONT_SMALL, a.mybrush, New Point(a.Left, a.Top))
+            If TypeOf a Is prt_ring Then
+                Dim rad As Integer = Game.TIME - a.spawn_time
+                Dim arect As New Rectangle(a.Left - rad / 2, a.Top - rad / 2, rad, rad)
+                e.Graphics.DrawEllipse(Pens.Azure, arect)
+            End If
+            If a.Name = "SPLASH" Then e.Graphics.DrawString(a.Text, Game.FONT_SMALL, Game.HUDBRUSH, New Point(a.Left, a.Top))
+            If Not a.Name = "SPLASH" Then e.Graphics.DrawString(a.Text, Game.FONT_SMALL, a.mybrush, New Point(a.Left, a.Top))
         Next
 
     End Sub
@@ -692,33 +769,42 @@ Public Class Form1
 
 
         ''Spawn enough enemies
-        If Game.ENEMIES_SPAWNED <= Game.WAVE_SIZE And Not Game.ENEMIES_SPAWNED < 0 Then
+        If Game.ENEMIES_SPAWNED <= Game.WAVE_SIZE And Not Game.ENEMIES_SPAWNED < 0 And Game.TIME > 20 Then
 
             Game.ENEMIES_SPAWNED += 1
+            Dim type_to_spawn As String = "Knave"
+            ''After level 1, the last guy to spawn is a KNIGHT
+            If Game.ENEMIES_SPAWNED = Game.WAVE_SIZE And Game.LEVEL > 1 Then type_to_spawn = "Knight"
+            ''After level 5 half of the guys spawned are KNIGHTS
+            If Game.ENEMIES_SPAWNED > Game.WAVE_SIZE / 2 And Game.LEVEL >= 5 Then type_to_spawn = "Knight"
+            ''After level 3, the last guy spawned is a BARON
+            If Game.ENEMIES_SPAWNED = Game.WAVE_SIZE And Game.LEVEL >= 3 Then type_to_spawn = "Baron"
+            ''Level 9 ALL DAY
+            If Game.LEVEL >= 9 Then type_to_spawn = "Knightmare"
 
+            If type_to_spawn = "Knave" Then Spawn_Knight(DEFAULT_WIDTH / 2, DEFAULT_HEIGHT / 2)
+            If type_to_spawn = "Knight" Then Spawn_Elite(DEFAULT_WIDTH / 2, DEFAULT_HEIGHT / 2)
+            If type_to_spawn = "Baron" Then Spawn_Champion(DEFAULT_WIDTH / 2, DEFAULT_HEIGHT / 2)
+            If type_to_spawn = "Knightmare" Then Spawn_Nightmare(DEFAULT_WIDTH / 2, DEFAULT_HEIGHT / 2)
 
-            Dim knight As Knight
-            If Game.ENEMIES_SPAWNED < Game.WAVE_SIZE Then knight = Spawn_Knight(DEFAULT_WIDTH / 2, DEFAULT_HEIGHT / 2)
-            If Game.ENEMIES_SPAWNED = Game.WAVE_SIZE Then knight = Spawn_Elite(DEFAULT_WIDTH / 2, DEFAULT_HEIGHT / 2)
-
+            ''If we've spawned enough, stop spawning
             If Game.ENEMIES_SPAWNED = Game.WAVE_SIZE Then Game.ENEMIES_SPAWNED = -1
 
         End If
 
-        ''Use this for global animation and timers and shit
-        Game.TIME += 1
-        ''Start the next wave
+            ''Use this for global animation and timers and shit
+            Game.TIME += 1
+            ''Start the next wave
         If Game.INTERLUDE_START > 0 And Game.INTERLUDE_START + Game.INTERLUDE_LENGTH < Game.TIME Then
-            Dim myself As New Particle(Game.TIME, Game.DEFAULT_WIDTH / 2, Game.DEFAULT_HEIGHT / 2, "LEVEL " + Game.LEVEL.ToString + " - " + Game.WAVE.ToString + ", " + Game.WAVE_SIZE.ToString + " enemies!")
-            ParticleList.Add(myself, myself.Name)
-            myself.float_rate = False
+            Game.SplashText(Game.TIME, "LEVEL " + Game.LEVEL.ToString + " - " + Game.WAVE.ToString + ", " + Game.WAVE_SIZE.ToString + " foes approach!")
             ''Toggle the interlude to off
             Game.INTERLUDE_START = -1
             ''Begin Spawning Enemies
             Game.ENEMIES_SPAWNED = 0
         End If
-        ''Clean up Pop-Up scores that need to leave now
-        For Each lab As Particle In ParticleList
+            ''Clean up Pop-Up scores that need to leave now
+            For Each lab As Particle In ParticleList
+
             lab.Top -= lab.float_rate
             If Game.TIME > lab.spawn_time + lab.exists_length Then
                 ParticleList.Remove(lab.Name)
@@ -726,6 +812,7 @@ Public Class Form1
                 ''Derefence the label
                 lab = Nothing
             End If
+
         Next
     End Sub
 

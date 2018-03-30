@@ -148,29 +148,17 @@
   <data name="sfx_flap" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Jump6.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="sfx_hit_enemy" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\sfx_hit_enemy.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="sfx_jump" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Laser_Shoot8.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="sfx_land" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Laser_Shoot.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="sfx_parry" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Powerup7.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="sfx_player_hit" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\Randomize6.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="sfx_spawn" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Powerup10.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="mount_down" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\mount_down.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="rider_turn" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\rider_turn.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="castle" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\castle.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -180,5 +168,29 @@
   </data>
   <data name="crag" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\crag.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="menu_bleep" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\menu_bleep.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="sfx_impale_enemy" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\sfx_impale_enemy.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="sfx_jump" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\sfx_jump_offground.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="sfx_losegame" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\sfx_losegame.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="sfx_player_hit" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\sfx_yelp.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="rider_dive" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\rider_dive.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="rider_turn" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\rider_turn.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="knight_fall" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\knight_fall.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

@@ -39,7 +39,7 @@ Alexander Macey
 
 
 GRAPHICS
-Oryx
+Alexander Macey
 
 
 
@@ -59,7 +59,7 @@ Joust
 
 
 
-Special Thanks To
+SPECIAL THANKS TO
 
 James Cole, for no particular reason
 
@@ -109,16 +109,25 @@ SIR BEDEVIERE
 2000
 KNIGHT
 1000
-SQUIRE
-500
-PEASANT
-100
+Alex Again
+950
+Alex Macey
+450
 DUNG-GATHERER
-50.
+50
+.
 </summary>
 </member><member name="P:JoustClone.My.Resources.Resources.knight_dismount">
 	<summary>
   Looks up a localized resource of type System.Drawing.Bitmap.
+</summary>
+</member><member name="P:JoustClone.My.Resources.Resources.knight_fall">
+	<summary>
+  Looks up a localized resource of type System.Drawing.Bitmap.
+</summary>
+</member><member name="P:JoustClone.My.Resources.Resources.menu_bleep">
+	<summary>
+  Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
 </summary>
 </member><member name="P:JoustClone.My.Resources.Resources.mount_down">
 	<summary>
@@ -127,6 +136,10 @@ DUNG-GATHERER
 </member><member name="P:JoustClone.My.Resources.Resources.Pickup_Coin14">
 	<summary>
   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+</summary>
+</member><member name="P:JoustClone.My.Resources.Resources.rider_dive">
+	<summary>
+  Looks up a localized resource of type System.Drawing.Bitmap.
 </summary>
 </member><member name="P:JoustClone.My.Resources.Resources.rider_down">
 	<summary>
@@ -148,7 +161,7 @@ DUNG-GATHERER
 	<summary>
   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
 </summary>
-</member><member name="P:JoustClone.My.Resources.Resources.sfx_hit_enemy">
+</member><member name="P:JoustClone.My.Resources.Resources.sfx_impale_enemy">
 	<summary>
   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
 </summary>
@@ -157,6 +170,10 @@ DUNG-GATHERER
   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
 </summary>
 </member><member name="P:JoustClone.My.Resources.Resources.sfx_land">
+	<summary>
+  Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+</summary>
+</member><member name="P:JoustClone.My.Resources.Resources.sfx_losegame">
 	<summary>
   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
 </summary>

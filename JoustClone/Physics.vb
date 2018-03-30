@@ -183,18 +183,19 @@
             If k.Vspeed < 0 Then k.Vspeed *= -0.5
         End If
 
-
-
         ''Coming from Right Side
         If k.Left <= w.Right And k.Right >= w.Right And k.Bottom > w.Top And k.Top < w.Bottom And COLLIDED = False Then
             If k.Right > w.Right Then k.Left = w.Right
-            k.Hspeed = 0
+            If k.Hspeed < -0.5 Then k.Hspeed = 0
+            If k.Hspeed < 0 Then k.Hspeed *= -0.5
+
             COLLIDED = True
         End If
         ''Coming from LEft Side
         If k.Right >= w.Left And k.Left <= w.Left And (k.Bottom > w.Top And k.Bottom < w.Bottom) Or k.Right >= w.Left And k.Left <= w.Left And (k.Top < w.Top And k.Bottom > w.Top) And COLLIDED = False Then
             If k.Left < w.Left Then k.Left = w.Left - k.Width
-            k.Hspeed = 0
+            If k.Hspeed > 0.5 Then k.Hspeed = 0
+            If k.Hspeed > 0 Then k.Hspeed *= -0.5
             COLLIDED = True
         End If
 

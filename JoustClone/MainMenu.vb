@@ -15,24 +15,28 @@ Public Class MainMenu
     Private Declare Function mciSendString Lib "winmm.dll" Alias "mciSendStringA" (ByVal lpstrCommand As String, ByVal lpstrReturnString As String, ByVal uReturnLength As Int32, ByVal hwndCallback As Int32) As Int32
 
     Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
+        Sound.play_sfx(My.Resources.menu_bleep)
         Me.Close()
     End Sub
 
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
-
+        Game.BEEN_PLAYED = False
+        Sound.play_sfx(My.Resources.menu_bleep)
         ScoreScreen.Show()
         Me.Close()
 
     End Sub
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        Sound.play_sfx(My.Resources.menu_bleep)
         Game.NUM_PLAYERS = 1
         Game.Start()
         Form1.Show()
     End Sub
 
-    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+    Private Sub Button2_Click(sender As Object, e As EventArgs)
         OptionsScreen.Show()
+        Sound.play_sfx(My.Resources.menu_bleep)
     End Sub
 
     Private Sub MainMenu_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
@@ -40,11 +44,11 @@ Public Class MainMenu
     End Sub
 
     Private Sub MainMenu_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-
+        Game.ClearGame()
         Game.WON = False
         lblStudios.Font = Game.FONT
         If My.Settings.fullscreen = True Then Me.WindowState = FormWindowState.Maximized
-        Sound.play_bgm("C:\Users\student\Desktop\bgm_title.mp3")
+        Sound.play_bgm("bgm_title.mp3")
 
     End Sub
 
@@ -83,6 +87,7 @@ Public Class MainMenu
     End Sub
 
     Private Sub Button5_Click(sender As Object, e As EventArgs) Handles Button5.Click
+        Sound.play_sfx(My.Resources.menu_bleep)
         CreditsScreen.Show()
     End Sub
 
@@ -91,6 +96,7 @@ Public Class MainMenu
     End Sub
 
     Private Sub Button6_Click(sender As Object, e As EventArgs) Handles Button6.Click
+        Sound.play_sfx(My.Resources.menu_bleep)
         Game.NUM_PLAYERS = 2
         Game.Start()
         Form1.Show()

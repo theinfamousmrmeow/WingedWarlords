@@ -44,7 +44,8 @@ Public Class Agent '': Inherits PictureBox
         Visible = True
         Width = 40
         Height = 30
-        facing = 1
+        facing = Game.Random.Next(2) - 1
+        If facing = 0 Then facing = -1
         ''Image = JoustClone.My.Resources.
 
     End Sub
@@ -80,9 +81,8 @@ Public Class Agent '': Inherits PictureBox
 
     ''
     Function Isplayer(ByVal agent)
-        Dim player As Agent
-        player = Game.Agents(1)
-        If agent.Equals(player) Then
+
+        If Game.PLAYERS.Contains(agent.Name) Then
             Return True
         Else
             Return False
@@ -104,12 +104,12 @@ Public Class Agent '': Inherits PictureBox
             ''If he's on the ground, use jumping height
             If OnGround = True Then
                 Vspeed = -jump_speed
-                If Isplayer(agent) Then My.Computer.Audio.Play(My.Resources.sfx_jump, AudioPlayMode.Background)
+                If Isplayer(agent) Then Sound.play_sfx(My.Resources.sfx_jump)
                 ''If he's not on the ground, use Flapping Speed
             Else
                 Vspeed -= flap_speed
                 If Vspeed > 0 Then Vspeed = 0
-                If Isplayer(agent) Then My.Computer.Audio.Play(My.Resources.sfx_flap, AudioPlayMode.Background)
+                If Isplayer(agent) Then Sound.play_sfx(My.Resources.sfx_flap, -1)
             End If
 
             If Vspeed < max_flyspeed Then Vspeed = max_flyspeed
@@ -129,7 +129,7 @@ Public Class Knight : Inherits Agent
         player_num = -1
         skill = 0
         Width = 32
-        Height = 32
+        Height = 30
         Image = JoustClone.My.Resources.rider_stand
     End Sub
 
@@ -230,8 +230,6 @@ Public Class Pickup '': Inherits PictureBox
     Public Top As Integer = 0
     Public Name As String = "Null"
     Public Image As Image
-    Public Shielded As Boolean = False
-    Public has_sword As Boolean = False
     ''
     Public INPUT_x As Integer = 0
     Public INPUT_y As Integer = 0

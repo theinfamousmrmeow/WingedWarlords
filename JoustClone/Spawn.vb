@@ -13,7 +13,12 @@
         guy.flap_speed *= 1.2
         guy.jump_speed *= 1
         guy.player_num = Game.PLAYERS.Count + 1
-        guy.Name = "Player" & guy.player_num ''Each knight ever created needs a unique name
+        ''SET THE COLORS
+        If guy.player_num = 1 Then guy.palette = Palettes.normal
+        If guy.player_num = 2 Then guy.palette = Palettes.playertwo
+        ''end of color setting
+        guy.Name = "Player" & guy.player_num
+        guy.palette = Palettes.normal
         ''Add to Agent List
         Game.PLAYERS.Add(guy, guy.Name)
         Game.Agents.Add(guy, guy.Name)
@@ -29,9 +34,10 @@
         Dim guy As New Knight(Game.TIME)
         guy.Left = x
         guy.Top = y
-        guy.Vspeed = -4
+        guy.Vspeed = (Game.Random.Next(5) * -1) + 1
+        guy.Hspeed = Game.Random.Next(3) - 1.5
         guy.INPUT_x = 1 - Math.Floor(Game.Random.Next(3))
-        guy.palette = Palettes.colorize_red
+        guy.palette = Palettes.knave
         number_of_agents += 1
         ''ReDim Preserve AgentArray(number_of_agents - 1)
         ''AgentArray(number_of_agents - 1) = guy
@@ -45,14 +51,38 @@
 
     End Function
 
+    Function Spawn_Champion(ByVal x As Integer, y As Integer)
+
+        Dim elite As Knight = Spawn_Knight(x, y)
+        elite.skill = 3
+        elite.palette = Palettes.baron
+        elite.max_hspeed *= 1.2
+        elite.accel *= 1.2
+
+        Return elite
+
+    End Function
+
     Function Spawn_Elite(ByVal x As Integer, y As Integer)
 
         Dim elite As Knight = Spawn_Knight(x, y)
         elite.skill = 1
-        elite.palette = Palettes.colorize_black
+        elite.palette = Palettes.knight
+
+        Return elite
 
     End Function
 
+    Function Spawn_Nightmare(ByVal x As Integer, y As Integer)
+        ''UNHOLY DEMON GUARDIANS OF THE CASTLE
+        Dim elite As Knight = Spawn_Knight(x, y)
+        elite.skill = 4
+        elite.palette = Palettes.unholy
+        elite.max_hspeed *= 1.25
+        elite.accel *= 1.25
+        Return elite
+
+    End Function
 
     Function Spawn_Mount(ByVal x As Integer, y As Integer)
         ''Create the new Knight
